@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#101820" />
+  <title>Wonders Rally</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">WORLD TOUR RACING</p>
+        <h1>Wonders Rally</h1>
+        <p class="subtitle">Race across legendary landmarks, collect relics, hit boost gates, and beat the clock.</p>
+      </div>
+      <button id="soundBtn" class="icon-btn" aria-label="Toggle sound">🔊</button>
+    </section>
+
+    <section class="game-card">
+      <div class="topbar">
+        <div><span>Track</span><strong id="trackName">Great Wall Sprint</strong></div>
+        <div><span>Time</span><strong id="timeReadout">00:00.000</strong></div>
+        <div><span>Relics</span><strong id="relicReadout">0 / 0</strong></div>
+        <div><span>Best</span><strong id="bestReadout">--:--.---</strong></div>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="game" width="1280" height="720" aria-label="Wonders Rally racing game"></canvas>
+
+        <div id="menu" class="overlay show">
+          <div class="panel">
+            <p class="eyebrow">SELECT DESTINATION</p>
+            <h2>Choose a Wonder</h2>
+            <div id="trackGrid" class="track-grid"></div>
+            <div class="instructions">
+              <span>Keyboard: WASD / Arrow Keys</span>
+              <span>Brake: Space</span>
+              <span>Mobile: On-screen controls</span>
+            </div>
+            <button id="startBtn" class="primary-btn">Start Race</button>
+          </div>
+        </div>
+
+        <div id="finish" class="overlay">
+          <div class="panel finish-panel">
+            <p class="eyebrow">RACE COMPLETE</p>
+            <h2 id="finishTitle">Great run!</h2>
+            <div class="score-row"><span>Final time</span><strong id="finishTime">00:00.000</strong></div>
+            <div class="score-row"><span>Relics found</span><strong id="finishRelics">0 / 0</strong></div>
+            <div class="score-row"><span>Time bonus</span><strong id="finishBonus">0.000s</strong></div>
+            <div class="finish-actions">
+              <button id="retryBtn" class="primary-btn">Race Again</button>
+              <button id="nextBtn" class="secondary-btn">Next Wonder</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-controls" aria-label="Touch controls">
+          <div class="steer-pad">
+            <button data-control="left" aria-label="Steer left">◀</button>
+            <button data-control="right" aria-label="Steer right">▶</button>
+          </div>
+          <div class="pedal-pad">
+            <button data-control="brake" class="brake" aria-label="Brake">BRAKE</button>
+            <button data-control="gas" class="gas" aria-label="Accelerate">GO</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-strip">
+        <div class="meter"><span>Speed</span><div class="meter-bar"><i id="speedBar"></i></div></div>
+        <div class="status" id="statusText">Select a destination to begin.</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -2,78 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#101820" />
-  <title>Wonders Rally</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="theme-color" content="#05070a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Wonders Rally: World Tour</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="app-shell">
-    <section class="hero">
-      <div>
-        <p class="eyebrow">WORLD TOUR RACING</p>
-        <h1>Wonders Rally</h1>
-        <p class="subtitle">Race across legendary landmarks, collect relics, hit boost gates, and beat the clock.</p>
+  <main id="app" class="app">
+    <canvas id="game" width="1600" height="900" aria-label="Wonders Rally racing game"></canvas>
+
+    <section id="hud" class="hud hidden" aria-live="polite">
+      <div class="hud-top">
+        <div class="track-chip">
+          <span id="countryLabel">CHINA</span>
+          <strong id="trackName">Great Wall Run</strong>
+        </div>
+        <div class="race-data">
+          <div><span>TIME</span><strong id="timeReadout">00:00.000</strong></div>
+          <div><span>BEST</span><strong id="bestReadout">--:--.---</strong></div>
+          <div><span>RELICS</span><strong id="relicReadout">0 / 8</strong></div>
+        </div>
       </div>
-      <button id="soundBtn" class="icon-btn" aria-label="Toggle sound">🔊</button>
+
+      <div class="hud-bottom">
+        <div class="speed-cluster">
+          <div class="speed-number"><strong id="speedReadout">0</strong><span>KM/H</span></div>
+          <div class="meter"><i id="speedBar"></i></div>
+        </div>
+        <div id="statusText" class="status">Hold the wheel and race.</div>
+        <div class="nitro-cluster">
+          <span>NITRO</span>
+          <div class="meter nitro"><i id="nitroBar"></i></div>
+        </div>
+      </div>
     </section>
 
-    <section class="game-card">
-      <div class="topbar">
-        <div><span>Track</span><strong id="trackName">Great Wall Sprint</strong></div>
-        <div><span>Time</span><strong id="timeReadout">00:00.000</strong></div>
-        <div><span>Relics</span><strong id="relicReadout">0 / 0</strong></div>
-        <div><span>Best</span><strong id="bestReadout">--:--.---</strong></div>
-      </div>
-
-      <div class="canvas-wrap">
-        <canvas id="game" width="1280" height="720" aria-label="Wonders Rally racing game"></canvas>
-
-        <div id="menu" class="overlay show">
-          <div class="panel">
-            <p class="eyebrow">SELECT DESTINATION</p>
-            <h2>Choose a Wonder</h2>
-            <div id="trackGrid" class="track-grid"></div>
-            <div class="instructions">
-              <span>Keyboard: WASD / Arrow Keys</span>
-              <span>Brake: Space</span>
-              <span>Mobile: On-screen controls</span>
-            </div>
-            <button id="startBtn" class="primary-btn">Start Race</button>
-          </div>
+    <section id="menu" class="screen show">
+      <div class="menu-shell">
+        <div class="brand-block">
+          <p class="eyebrow">CINEMATIC WORLD TOUR</p>
+          <h1>WONDERS<br><em>RALLY</em></h1>
+          <p class="tagline">A high-speed arcade journey through the New Seven Wonders of the World.</p>
         </div>
 
-        <div id="finish" class="overlay">
-          <div class="panel finish-panel">
-            <p class="eyebrow">RACE COMPLETE</p>
-            <h2 id="finishTitle">Great run!</h2>
-            <div class="score-row"><span>Final time</span><strong id="finishTime">00:00.000</strong></div>
-            <div class="score-row"><span>Relics found</span><strong id="finishRelics">0 / 0</strong></div>
-            <div class="score-row"><span>Time bonus</span><strong id="finishBonus">0.000s</strong></div>
-            <div class="finish-actions">
-              <button id="retryBtn" class="primary-btn">Race Again</button>
-              <button id="nextBtn" class="secondary-btn">Next Wonder</button>
+        <div class="menu-panel">
+          <div class="menu-heading">
+            <div>
+              <p class="eyebrow">SELECT A DESTINATION</p>
+              <h2 id="selectedTitle">Great Wall Run</h2>
+              <p id="selectedDescription">Thread the mountain ridges beside the Great Wall of China.</p>
+            </div>
+            <div class="menu-actions-small">
+              <button id="soundBtn" class="glass-btn" aria-label="Toggle sound">SOUND ON</button>
+              <button id="fullscreenBtn" class="glass-btn">FULL SCREEN</button>
             </div>
           </div>
-        </div>
 
-        <div class="mobile-controls" aria-label="Touch controls">
-          <div class="steer-pad">
-            <button data-control="left" aria-label="Steer left">◀</button>
-            <button data-control="right" aria-label="Steer right">▶</button>
-          </div>
-          <div class="pedal-pad">
-            <button data-control="brake" class="brake" aria-label="Brake">BRAKE</button>
-            <button data-control="gas" class="gas" aria-label="Accelerate">GO</button>
-          </div>
-        </div>
-      </div>
+          <div id="trackGrid" class="track-grid" aria-label="Track selection"></div>
 
-      <div class="bottom-strip">
-        <div class="meter"><span>Speed</span><div class="meter-bar"><i id="speedBar"></i></div></div>
-        <div class="status" id="statusText">Select a destination to begin.</div>
+          <div class="control-choice">
+            <div>
+              <strong>iPad controls</strong>
+              <span>Auto-accelerate, thumb steering, brake, and nitro.</span>
+            </div>
+            <button id="tiltBtn" class="glass-btn">ENABLE TILT</button>
+          </div>
+
+          <button id="startBtn" class="start-btn"><span>START RACE</span><b>›</b></button>
+        </div>
       </div>
     </section>
+
+    <section id="countdown" class="countdown" aria-hidden="true"><span>3</span></section>
+
+    <section id="finish" class="screen">
+      <div class="finish-card">
+        <p class="eyebrow">STAGE COMPLETE</p>
+        <h2 id="finishTitle">WONDER CONQUERED</h2>
+        <div class="finish-time" id="finishTime">00:00.000</div>
+        <div class="finish-stats">
+          <div><span>Relics</span><strong id="finishRelics">0 / 8</strong></div>
+          <div><span>Relic bonus</span><strong id="finishBonus">-0.000s</strong></div>
+          <div><span>Top speed</span><strong id="finishSpeed">0 km/h</strong></div>
+        </div>
+        <div class="finish-actions">
+          <button id="retryBtn" class="start-btn"><span>RACE AGAIN</span><b>↻</b></button>
+          <button id="nextBtn" class="glass-btn large">NEXT WONDER</button>
+          <button id="menuBtn" class="glass-btn large">DESTINATIONS</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="touchControls" class="touch-controls hidden" aria-label="Touch racing controls">
+      <div id="steerPad" class="steer-pad">
+        <div class="steer-ring"></div>
+        <div id="steerKnob" class="steer-knob"><span>◀</span><span>▶</span></div>
+        <small>STEER</small>
+      </div>
+      <div class="pedals">
+        <button id="nitroBtn" class="nitro-btn" aria-label="Nitro boost"><span>NITRO</span><b>⚡</b></button>
+        <button id="brakeBtn" class="brake-btn" aria-label="Brake"><span>BRAKE</span></button>
+      </div>
+    </section>
+
+    <div class="rotate-notice"><strong>Rotate your iPad</strong><span>Wonders Rally is designed for landscape play.</span></div>
   </main>
 
   <script src="game.js"></script>

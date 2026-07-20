@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Wonders Rally: World Tour</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-zero-drift.css" />
 </head>
 <body>
   <main id="app" class="app">
@@ -65,9 +65,9 @@
           <div class="control-choice">
             <div>
               <strong>iPad controls</strong>
-              <span>Rotating steering wheel, accelerator, brake, nitro, and optional tilt.</span>
+              <span>Drag the wheel left or right. Releasing it returns steering to an exact neutral center.</span>
             </div>
-            <button id="tiltBtn" class="glass-btn">ENABLE TILT</button>
+            <div class="center-lock">ZERO-DRIFT CENTER LOCK</div>
           </div>
 
           <button id="startBtn" class="start-btn"><span>START RACE</span><b>›</b></button>
@@ -107,7 +107,7 @@
             <div class="wheel-marker"></div>
           </div>
         </div>
-        <small>STEERING</small>
+        <small id="steeringStatus">CENTERED</small>
       </div>
       <div class="pedals">
         <button id="nitroBtn" class="nitro-btn" aria-label="Nitro boost"><span>NITRO</span><b>⚡</b></button>
@@ -119,6 +119,6 @@
     <div class="rotate-notice"><strong>Rotate your iPad</strong><span>Wonders Rally is designed for landscape play.</span></div>
   </main>
 
-  <script src="game.js"></script>
+  <script src="game-zero-drift.js"></script>
 </body>
 </html>

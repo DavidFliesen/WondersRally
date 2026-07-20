@@ -5,8 +5,8 @@ A rebuilt browser racing prototype designed for iPad landscape play.
 ## What changed
 
 - Full-screen cinematic presentation
-- Large analog-style thumb steering instead of relying on arrow keys
-- Auto-acceleration, brake, nitro, optional iPad tilt steering
+- Full rotating steering wheel with spring return instead of arrow-style steering
+- Separate accelerator, brake, nitro, and optional iPad tilt steering
 - Actual photographs of all seven New Wonders used in the tracks and destination cards
 - New pseudo-3D road renderer, road curvature, lane markings, scenery, speed effects, particles, a more detailed car, engine sound, race HUD, relics, hazards, boost gates, and saved best times
 
@@ -26,17 +26,18 @@ Then open `http://localhost:8000`.
 
 ### iPad / touch
 
-- The car accelerates automatically.
-- Drag the large wheel on the left to steer.
-- Hold **BRAKE** to slow down.
-- Hold **NITRO** for a speed boost.
+- Turn the steering wheel on the left. It springs back to center when released.
+- Hold **ACCEL** to accelerate.
+- Hold **BRAKE** to slow down and gain slightly sharper turn-in.
+- Hold **NITRO** while accelerating for a speed boost, with reduced high-speed grip.
 - **ENABLE TILT** can use iPad motion steering when browser permission is granted.
 
 ### Keyboard
 
 - A / D or Left / Right: steer
+- W or Up: accelerator
 - S, Down, or Space: brake
-- W, Up, or Shift: nitro
+- Shift: nitro
 
 ## Photograph credits
 
@@ -58,3 +59,11 @@ The photographs are bundled locally and sourced from Wikimedia Commons under Cre
   Source: https://commons.wikimedia.org/wiki/File:Cristo_Redentor_-_Rio_de_Janeiro,_Brasil.jpg
 
 This remains a lightweight browser prototype rather than a commercial AAA production. It is designed to create a substantially more cinematic arcade-racing feel without requiring a game engine or multi-gigabyte 3D asset library.
+
+
+## Revised driving model
+
+- Touch steering wheel with spring return and a centered dead zone
+- Dedicated accelerator, brake, and nitro controls
+- Independent throttle, coasting, braking, road grip, off-road drag, and nitro traction
+- Road curvature is visual and no longer forces the car left or right

@@ -65,7 +65,7 @@
           <div class="control-choice">
             <div>
               <strong>iPad controls</strong>
-              <span>Auto-accelerate, thumb steering, brake, and nitro.</span>
+              <span>Rotating steering wheel, accelerator, brake, nitro, and optional tilt.</span>
             </div>
             <button id="tiltBtn" class="glass-btn">ENABLE TILT</button>
           </div>
@@ -96,14 +96,23 @@
     </section>
 
     <section id="touchControls" class="touch-controls hidden" aria-label="Touch racing controls">
-      <div id="steerPad" class="steer-pad">
-        <div class="steer-ring"></div>
-        <div id="steerKnob" class="steer-knob"><span>◀</span><span>▶</span></div>
-        <small>STEER</small>
+      <div class="steering-wheel-wrap">
+        <div id="steeringWheel" class="steering-wheel" role="slider" aria-label="Steering wheel" aria-valuemin="-100" aria-valuemax="100" aria-valuenow="0">
+          <div id="wheelFace" class="wheel-face">
+            <div class="wheel-rim"></div>
+            <i class="wheel-spoke spoke-left"></i>
+            <i class="wheel-spoke spoke-right"></i>
+            <i class="wheel-spoke spoke-bottom"></i>
+            <div class="wheel-hub"><span>WR</span></div>
+            <div class="wheel-marker"></div>
+          </div>
+        </div>
+        <small>STEERING</small>
       </div>
       <div class="pedals">
         <button id="nitroBtn" class="nitro-btn" aria-label="Nitro boost"><span>NITRO</span><b>⚡</b></button>
         <button id="brakeBtn" class="brake-btn" aria-label="Brake"><span>BRAKE</span></button>
+        <button id="gasBtn" class="gas-btn" aria-label="Accelerator"><span>ACCEL</span><b>▲</b></button>
       </div>
     </section>
 

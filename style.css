@@ -64,19 +64,30 @@ h1 em{font-style:normal;color:transparent;-webkit-text-stroke:2px #fff;text-stro
 .countdown.show{display:flex}
 .countdown span{font-size:min(32vw,310px);font-weight:950;font-style:italic;line-height:1;color:white;text-shadow:0 0 30px rgba(255,255,255,.5),0 25px 70px #000;animation:countPop .72s both}
 @keyframes countPop{0%{transform:scale(1.7);opacity:0}30%{opacity:1}100%{transform:scale(.72);opacity:.25}}
-.touch-controls{position:absolute;inset:auto 0 0;z-index:12;display:flex;justify-content:space-between;align-items:flex-end;padding:0 max(26px,env(safe-area-inset-right)) max(25px,env(safe-area-inset-bottom)) max(26px,env(safe-area-inset-left));pointer-events:none}
-.steer-pad{position:relative;width:clamp(150px,19vw,220px);height:clamp(150px,19vw,220px);border-radius:50%;pointer-events:auto;touch-action:none;filter:drop-shadow(0 15px 25px #000)}
-.steer-ring{position:absolute;inset:8%;border:4px solid rgba(255,255,255,.24);border-radius:50%;box-shadow:inset 0 0 0 10px rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.6);backdrop-filter:blur(5px)}
-.steer-ring::before,.steer-ring::after{content:"";position:absolute;top:50%;width:37%;height:4px;background:rgba(255,255,255,.24)}
-.steer-ring::before{left:0}.steer-ring::after{right:0}
-.steer-knob{position:absolute;left:50%;top:50%;width:56%;height:56%;transform:translate(-50%,-50%);border-radius:50%;display:flex;align-items:center;justify-content:space-around;color:rgba(255,255,255,.72);font-weight:950;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(0,0,0,.34));border:1px solid rgba(255,255,255,.22);box-shadow:0 14px 30px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.2);transition:transform .08s linear}
-.steer-pad small{position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);font-size:.58rem;letter-spacing:.2em;font-weight:900;color:rgba(255,255,255,.75)}
-.pedals{display:flex;align-items:flex-end;gap:14px;pointer-events:auto}
-.pedals button{border:1px solid rgba(255,255,255,.23);color:#fff;font-weight:950;letter-spacing:.08em;box-shadow:0 18px 35px rgba(0,0,0,.4);touch-action:none;backdrop-filter:blur(7px)}
-.brake-btn{width:clamp(92px,11vw,130px);height:clamp(92px,11vw,130px);border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,100,100,.85),rgba(135,10,16,.75))}
-.nitro-btn{width:clamp(78px,9vw,108px);height:clamp(118px,14vw,165px);border-radius:999px;background:linear-gradient(180deg,rgba(44,146,255,.85),rgba(22,30,100,.82));display:flex;flex-direction:column;align-items:center;justify-content:center}
-.nitro-btn b{font-size:1.5rem;margin-top:5px}
-.pedals button.pressed{transform:scale(.94);filter:brightness(1.35)}
+.touch-controls{position:absolute;inset:auto 0 0;z-index:12;display:flex;justify-content:space-between;align-items:flex-end;padding:0 max(24px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));pointer-events:none}
+.steering-wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none;filter:drop-shadow(0 18px 28px rgba(0,0,0,.72))}
+.steering-wheel-wrap small{font-size:.58rem;letter-spacing:.2em;font-weight:950;color:rgba(255,255,255,.78);text-shadow:0 2px 8px #000}
+.steering-wheel{position:relative;width:clamp(178px,21vw,248px);height:clamp(178px,21vw,248px);border-radius:50%;pointer-events:auto;touch-action:none;cursor:grab}
+.steering-wheel:active{cursor:grabbing}
+.wheel-face{position:absolute;inset:2%;transform:rotate(0deg);transform-origin:50% 50%;will-change:transform}
+.wheel-rim{position:absolute;inset:2%;border-radius:50%;border:clamp(15px,1.7vw,22px) solid rgba(11,14,19,.94);background:radial-gradient(circle,transparent 54%,rgba(255,255,255,.14) 55%,transparent 60%);box-shadow:inset 0 0 0 3px rgba(255,255,255,.16),inset 0 0 0 8px rgba(0,0,0,.38),0 0 0 2px rgba(255,255,255,.22),0 16px 32px rgba(0,0,0,.45)}
+.wheel-rim::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px dashed rgba(255,255,255,.12)}
+.wheel-spoke{position:absolute;left:50%;top:50%;width:42%;height:14%;transform-origin:0 50%;background:linear-gradient(180deg,#38414b,#11161d);border:1px solid rgba(255,255,255,.19);box-shadow:inset 0 1px rgba(255,255,255,.16)}
+.spoke-left{transform:translate(0,-50%) rotate(150deg)}
+.spoke-right{transform:translate(0,-50%) rotate(30deg)}
+.spoke-bottom{transform:translate(0,-50%) rotate(90deg);width:37%}
+.wheel-hub{position:absolute;left:50%;top:50%;width:35%;height:35%;transform:translate(-50%,-50%);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 28%,#66727f,#11161c 68%);border:2px solid rgba(255,255,255,.25);box-shadow:0 8px 18px rgba(0,0,0,.5),inset 0 2px rgba(255,255,255,.2)}
+.wheel-hub span{font-size:clamp(.82rem,1.5vw,1.15rem);font-weight:950;letter-spacing:.06em;color:#edf3f8;text-shadow:0 2px 5px #000}
+.wheel-marker{position:absolute;left:50%;top:0;width:8%;height:11%;transform:translateX(-50%);border-radius:0 0 7px 7px;background:linear-gradient(#ffdc73,#d68c1c);box-shadow:0 0 12px rgba(255,193,68,.7)}
+.pedals{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;align-items:end;gap:10px 13px;pointer-events:auto}
+.pedals button{border:1px solid rgba(255,255,255,.25);color:#fff;font-weight:950;letter-spacing:.08em;box-shadow:0 18px 35px rgba(0,0,0,.46),inset 0 1px rgba(255,255,255,.2);touch-action:none;backdrop-filter:blur(8px);text-shadow:0 2px 5px #000}
+.pedals button span{font-size:.68rem}
+.brake-btn{grid-column:1;grid-row:2;width:clamp(88px,10vw,118px);height:clamp(88px,10vw,118px);border-radius:50%;background:radial-gradient(circle at 35% 28%,rgba(255,116,116,.92),rgba(125,7,15,.86))}
+.nitro-btn{grid-column:1;grid-row:1;width:clamp(74px,8.2vw,98px);height:clamp(72px,8vw,94px);justify-self:center;border-radius:22px;background:linear-gradient(180deg,rgba(51,165,255,.9),rgba(22,35,116,.88));display:flex;flex-direction:column;align-items:center;justify-content:center}
+.nitro-btn b{font-size:1.25rem;margin-top:2px}
+.gas-btn{grid-column:2;grid-row:1/3;width:clamp(100px,11.5vw,138px);height:clamp(154px,17vw,204px);border-radius:34px;background:linear-gradient(180deg,rgba(90,225,128,.94),rgba(14,101,51,.9));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.gas-btn b{font-size:1.45rem}
+.pedals button.pressed{transform:scale(.94);filter:brightness(1.34)}
 .finish-card{margin:auto;width:min(560px,90vw);padding:34px;border-radius:28px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(12,17,24,.96),rgba(4,6,9,.9));box-shadow:0 45px 120px #000;text-align:center}
 .finish-card h2{margin:0;font-size:clamp(2rem,5vw,4rem);line-height:.9}
 .finish-time{font-size:clamp(2.2rem,6vw,5rem);font-weight:950;font-style:italic;margin:22px 0;color:var(--gold)}
@@ -89,6 +100,7 @@ h1 em{font-style:normal;color:transparent;-webkit-text-stroke:2px #fff;text-stro
 .finish-actions .start-btn{grid-column:1/-1}
 .rotate-notice{display:none;position:absolute;inset:0;z-index:100;background:#06080c;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}
 .rotate-notice strong{font-size:2rem}.rotate-notice span{margin-top:8px;color:var(--muted)}
+@media (pointer:coarse){.hud-bottom{padding-bottom:clamp(122px,15vw,188px)}}
 @media (pointer:fine){.touch-controls{opacity:.72}}
 @media (max-width:1050px){
   .menu-shell{grid-template-columns:.62fr 1.38fr;gap:24px}

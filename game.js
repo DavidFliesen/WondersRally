@@ -29,8 +29,9 @@ const els = {
   sound: document.getElementById("soundBtn"),
   fullscreen: document.getElementById("fullscreenBtn"),
   tilt: document.getElementById("tiltBtn"),
-  steerPad: document.getElementById("steerPad"),
-  steerKnob: document.getElementById("steerKnob"),
+  steeringWheel: document.getElementById("steeringWheel"),
+  wheelFace: document.getElementById("wheelFace"),
+  gas: document.getElementById("gasBtn"),
   brake: document.getElementById("brakeBtn"),
   nitro: document.getElementById("nitroBtn"),
   finishTitle: document.getElementById("finishTitle"),
@@ -99,10 +100,13 @@ let distance = 0;
 let speed = 0;
 let topSpeed = 0;
 let lateral = 0;
+let lateralVelocity = 0;
 let steering = 0;
+let steeringTarget = 0;
 let keySteering = 0;
 let tiltSteering = 0;
 let tiltEnabled = false;
+let throttlePressed = false;
 let braking = false;
 let nitroPressed = false;
 let nitro = 100;
@@ -121,6 +125,11 @@ let audioContext = null;
 let engineOsc = null;
 let engineGain = null;
 let steerPointer = null;
+let wheelHeld = false;
+let wheelRotation = 0;
+let wheelStartRotation = 0;
+let wheelStartPointerAngle = 0;
+const MAX_WHEEL_ROTATION = 135;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -208,7 +217,12 @@ function startRace() {
   speed = 0;
   topSpeed = 0;
   lateral = 0;
+  lateralVelocity = 0;
   steering = 0;
+  steeringTarget = 0;
+  wheelRotation = 0;
+  updateWheelVisual(0);
+  throttlePressed = false;
   braking = false;
   nitroPressed = false;
   nitro = 100;
@@ -353,8 +367,8 @@ function updateGame(dt) {
       gameState = "racing";
       els.countdown.classList.remove("show");
       startEngine();
-      els.status.textContent = "AUTO-ACCELERATE ACTIVE";
-      messageTimer = 1000;
+      els.status.textContent = "HOLD ACCELERATOR TO LAUNCH";
+      messageTimer = 1400;
     }
     return;
   }
@@ -362,40 +376,70 @@ function updateGame(dt) {
 
   elapsed += dt;
   const track = tracks[selectedTrack];
+
+  const steeringResponse = wheelHeld ? 15 : 8.5;
+  steering += (steeringTarget - steering) * (1 - Math.exp(-steeringResponse * dt / 1000));
+  if (!wheelHeld) {
+    wheelRotation = steering * MAX_WHEEL_ROTATION;
+    updateWheelVisual(wheelRotation);
+  }
+
   const combinedSteering = clamp(keySteering + steering + tiltSteering, -1, 1);
   const offRoad = Math.abs(lateral) > 1.0;
-  const nitroActive = nitroPressed && nitro > 1 && !braking;
-  const targetSpeed = braking ? 88 : nitroActive ? 292 : 232;
-  const acceleration = braking ? 230 : nitroActive ? 112 : 58;
+  const nitroActive = nitroPressed && throttlePressed && nitro > 1 && !braking;
+  const maximumSpeed = nitroActive ? 310 : 242;
 
-  if (speed < targetSpeed) speed += acceleration * dt / 1000;
-  else speed -= (braking ? 180 : 24) * dt / 1000;
-  if (offRoad) {
-    speed -= 92 * dt / 1000;
-    penalties += dt * .09;
-    spawnDust(2);
-    if (messageTimer <= 0) setStatus("OFF ROAD — GRIP REDUCED", 700);
+  if (braking) {
+    speed -= (188 + speed * .48) * dt / 1000;
+  } else if (throttlePressed) {
+    const driveForce = (nitroActive ? 112 : 82) * Math.max(.08, 1 - speed / maximumSpeed);
+    const rollingResistance = nitroActive ? 3 : 7;
+    speed += (driveForce - rollingResistance) * dt / 1000;
+  } else {
+    speed -= (22 + speed * .085) * dt / 1000;
   }
+
+  if (offRoad) {
+    speed -= (62 + speed * .16) * dt / 1000;
+    penalties += dt * .045;
+    spawnDust(2);
+    if (messageTimer <= 0) setStatus("OFF ROAD — TRACTION REDUCED", 700);
+  }
+
   if (nitroActive) {
-    nitro -= 26 * dt / 1000;
+    nitro -= 25 * dt / 1000;
     spawnNitro(2);
   } else {
-    nitro += 8 * dt / 1000;
+    nitro += 3.5 * dt / 1000;
   }
   nitro = clamp(nitro, 0, 100);
-  speed = clamp(speed, 0, 300);
+  speed = clamp(speed, 0, 310);
   topSpeed = Math.max(topSpeed, speed);
 
-  const curve = trackCurveAt(distance);
-  lateral += combinedSteering * (1.15 + speed / 180) * dt / 1000;
-  lateral -= curve * speed * .00165 * dt / 16.67;
-  lateral = clamp(lateral, -1.46, 1.46);
+  const speedRatio = clamp(speed / 242, 0, 1.25);
+  const roadGrip = offRoad ? .48 : 1;
+  const nitroGrip = nitroActive ? .78 : 1;
+  const brakeTurnAssist = braking ? 1.13 : 1;
+  const steeringAuthority = (.44 + speedRatio * .72) * roadGrip * nitroGrip * brakeTurnAssist;
+  const desiredLateralVelocity = combinedSteering * steeringAuthority;
+  const gripResponse = offRoad ? 3.2 : 6.4;
+  lateralVelocity += (desiredLateralVelocity - lateralVelocity) * (1 - Math.exp(-gripResponse * dt / 1000));
+  if (Math.abs(combinedSteering) < .025) lateralVelocity *= Math.exp(-4.8 * dt / 1000);
+  lateral += lateralVelocity * dt / 1000;
+
+  if (Math.abs(lateral) > 1.38) {
+    lateral = Math.sign(lateral) * 1.38;
+    lateralVelocity *= -.16;
+    speed *= .985;
+  }
+
   distance += speed * .29 * dt / 1000;
 
   checkObjects();
   updateParticles(dt);
   updateEngine();
   if (messageTimer > 0) messageTimer -= dt;
+  else if (speed < 3 && !throttlePressed) els.status.textContent = "HOLD ACCELERATOR TO MOVE";
   else els.status.textContent = `${Math.max(0, Math.round(track.length - distance))} M TO FINISH`;
 
   if (distance >= track.length) finishRace();
@@ -636,7 +680,8 @@ function drawCar(width, height, track) {
   ctx.save();
   ctx.translate(carX, carY);
   ctx.scale(scale, scale);
-  ctx.rotate((keySteering + steering + tiltSteering) * -.035);
+  const visualSteering = clamp(keySteering + steering + tiltSteering, -1, 1);
+  ctx.rotate(visualSteering * -.04);
 
   ctx.fillStyle="rgba(0,0,0,.5)";ctx.filter="blur(10px)";ctx.beginPath();ctx.ellipse(0,74,130,27,0,0,Math.PI*2);ctx.fill();ctx.filter="none";
 
@@ -655,7 +700,7 @@ function drawCar(width, height, track) {
   ctx.fillStyle="#10151c";ctx.fillRect(-100,-2,200,9);
   ctx.fillStyle="rgba(255,255,255,.22)";ctx.beginPath();ctx.moveTo(-70,-20);ctx.lineTo(-45,-65);ctx.lineTo(-37,-65);ctx.lineTo(-57,-20);ctx.closePath();ctx.fill();
 
-  if (nitroPressed && nitro > 0 && !braking) {
+  if (nitroPressed && throttlePressed && nitro > 0 && !braking) {
     [-24,24].forEach(x=>{
       const flame=ctx.createLinearGradient(0,70,0,125);flame.addColorStop(0,"#fff");flame.addColorStop(.25,"#5deaff");flame.addColorStop(1,"rgba(29,70,255,0)");ctx.fillStyle=flame;ctx.beginPath();ctx.moveTo(x-9,70);ctx.quadraticCurveTo(x,126+Math.random()*16,x+9,70);ctx.closePath();ctx.fill();
     });
@@ -723,42 +768,78 @@ function loop(now) {
   updateGame(dt);drawFrame();requestAnimationFrame(loop);
 }
 
-function setSteeringFromPointer(event) {
-  const rect=els.steerPad.getBoundingClientRect();
-  const center=rect.left+rect.width/2;
-  steering=clamp((event.clientX-center)/(rect.width*.37),-1,1);
-  els.steerKnob.style.transform=`translate(calc(-50% + ${steering*rect.width*.19}px),-50%) rotate(${steering*22}deg)`;
+function pointerAngle(event) {
+  const rect = els.steeringWheel.getBoundingClientRect();
+  const x = event.clientX - (rect.left + rect.width / 2);
+  const y = event.clientY - (rect.top + rect.height / 2);
+  return Math.atan2(y, x) * 180 / Math.PI;
 }
+
+function normalizeAngle(angle) {
+  while (angle > 180) angle -= 360;
+  while (angle < -180) angle += 360;
+  return angle;
+}
+
+function updateWheelVisual(rotation) {
+  els.wheelFace.style.transform = `rotate(${rotation.toFixed(2)}deg)`;
+  els.steeringWheel.setAttribute("aria-valuenow", String(Math.round(rotation / MAX_WHEEL_ROTATION * 100)));
+}
+
+function setWheelFromPointer(event) {
+  const delta = normalizeAngle(pointerAngle(event) - wheelStartPointerAngle);
+  wheelRotation = clamp(wheelStartRotation + delta, -MAX_WHEEL_ROTATION, MAX_WHEEL_ROTATION);
+  steeringTarget = wheelRotation / MAX_WHEEL_ROTATION;
+  updateWheelVisual(wheelRotation);
+}
+
 function releaseSteering() {
-  steering=0;steerPointer=null;els.steerKnob.style.transform="translate(-50%,-50%)";
+  wheelHeld = false;
+  steeringTarget = 0;
+  steerPointer = null;
 }
-els.steerPad.addEventListener("pointerdown",event=>{steerPointer=event.pointerId;els.steerPad.setPointerCapture(event.pointerId);setSteeringFromPointer(event);});
-els.steerPad.addEventListener("pointermove",event=>{if(event.pointerId===steerPointer)setSteeringFromPointer(event);});
-els.steerPad.addEventListener("pointerup",event=>{if(event.pointerId===steerPointer)releaseSteering();});
-els.steerPad.addEventListener("pointercancel",releaseSteering);
+
+els.steeringWheel.addEventListener("pointerdown", event => {
+  event.preventDefault();
+  steerPointer = event.pointerId;
+  wheelHeld = true;
+  wheelStartPointerAngle = pointerAngle(event);
+  wheelStartRotation = wheelRotation;
+  els.steeringWheel.setPointerCapture(event.pointerId);
+});
+els.steeringWheel.addEventListener("pointermove", event => {
+  if (event.pointerId === steerPointer) setWheelFromPointer(event);
+});
+els.steeringWheel.addEventListener("pointerup", event => {
+  if (event.pointerId === steerPointer) releaseSteering();
+});
+els.steeringWheel.addEventListener("pointercancel", releaseSteering);
 
 function setHoldButton(element,setter) {
   const down=e=>{e.preventDefault();element.setPointerCapture?.(e.pointerId);setter(true);element.classList.add("pressed");};
   const up=e=>{e.preventDefault();setter(false);element.classList.remove("pressed");};
   element.addEventListener("pointerdown",down);element.addEventListener("pointerup",up);element.addEventListener("pointercancel",up);element.addEventListener("pointerleave",e=>{if(e.buttons===0)up(e);});
 }
-setHoldButton(els.brake,value=>braking=value);
-setHoldButton(els.nitro,value=>nitroPressed=value);
+setHoldButton(els.gas, value => throttlePressed = value);
+setHoldButton(els.brake, value => braking = value);
+setHoldButton(els.nitro, value => nitroPressed = value);
 
 addEventListener("keydown",event=>{
   const key=event.key.toLowerCase();
   if(key==="arrowleft"||key==="a")keySteering=-1;
   if(key==="arrowright"||key==="d")keySteering=1;
+  if(key==="arrowup"||key==="w")throttlePressed=true;
   if(key==="arrowdown"||key==="s"||key===" ")braking=true;
-  if(key==="shift"||key==="arrowup"||key==="w")nitroPressed=true;
+  if(key==="shift")nitroPressed=true;
   if(["arrowleft","arrowright","arrowup","arrowdown"," "].includes(key))event.preventDefault();
 });
 addEventListener("keyup",event=>{
   const key=event.key.toLowerCase();
   if((key==="arrowleft"||key==="a")&&keySteering<0)keySteering=0;
   if((key==="arrowright"||key==="d")&&keySteering>0)keySteering=0;
+  if(key==="arrowup"||key==="w")throttlePressed=false;
   if(key==="arrowdown"||key==="s"||key===" ")braking=false;
-  if(key==="shift"||key==="arrowup"||key==="w")nitroPressed=false;
+  if(key==="shift")nitroPressed=false;
 });
 
 async function enableTilt() {
@@ -795,7 +876,7 @@ els.fullscreen.addEventListener("click",async()=>{
 });
 
 document.addEventListener("visibilitychange",()=>{
-  if(document.hidden){braking=false;nitroPressed=false;releaseSteering();stopEngine();}
+  if(document.hidden){throttlePressed=false;braking=false;nitroPressed=false;releaseSteering();stopEngine();}
   else if(gameState==="racing")startEngine();
 });
 
